@@ -1,0 +1,102 @@
+1. change model to accept parameterized hyper-parameters, instead of hyper-engine looks up particular names. Such as input, label, mode, minimize, loss, accuracy.
+2. first try to change hyper-engine using keras mnist model
+3. mnist DataSet records
+   a. images e.g. shape=(55,000, 784) for training set
+   b. labels e.g. shape=(55,000, 10)  for training set
+   c. epochs_completed
+   d. index_in_epoch points to the sample to be read next in the current epoch
+4. above (3) will be tracked by hyper-engine DataSet(IterableDataProvider)
+   a. __init__(self, x, y)
+          self._x = np.array(x)
+          self._y = np.array(y)
+	  self._size = self._x.shape[0]
+   b. IterableDataProvider(DataProvider)
+      a. self._epochs_completed = 0
+      b. self._index_in_epoch = 0
+      c. self._just_completed = False
+5. hype.Data holds
+   a. hype.DataSet(train)
+   b. hype.DataSet(validation)
+   c. hype.DataSet
+
+6. TensorflowSolver(BaseSolver)
+   def __init__(self, data, model=None, hyper_params=None, augmentation=None, model_io=None, reducer='max', **params)
+
+       # overidable interesting names here instead of extra_feed={}, input='input', label='label', mode='mode', loss='loss', accuracy='accuracy', train='minimize')
+       runner = TensorflowRunner(model) 
+
+       # record important info in BaseSolver 
+       super(TensorflowSolver, self).__init__(runner, data, hyper_params, augmentation, reducer, **params)
+
+7. TensorflowRunner
+   a. represents a connecting layer between the solver and the machine learning model. Find the "important" tensors
+    self._graph = model or tf.get_default_graph()
+    self._extra_feed = extra_feed
+
+    self._x = self._find_tensor(input)
+    self._y = self._find_tensor(label)
+    self._mode = self._find_tensor(mode, mandatory=False)
+    self._loss = self._find_tensor(loss, mandatory=False)
+    self._accuracy = self._find_tensor(accuracy, mandatory=False)
+    self._minimize = self._find_op(train)
+    self._model_size = self._calc_model_size()
+
+8. BaseSolver(object)
+   __init__():
+   a. 
+    data.reset_counters()  # (5) container components get reset. i.e. [train|validation|test].reset_counters
+                             # self._step = self._epochs_completed = self._index_in_epoch = 0;
+			     # self._just_completed = False
+   b.
+    self._train_set = data.train
+    self._val_set = data.validation
+    self._test_set = data.test
+    self._augmentation = augmentation
+    self._runner = runner
+    self._hyper_params = hyper_params
+    self._reducer = as_numeric_function(reducer, presets=reducers)
+    self._max_val_accuracy = 0
+    self._val_accuracy_curve = []
+
+    self._epochs = params.get('epochs', 1)
+    self._dynamic_epochs = params.get('dynamic_epochs')
+    self._stop_condition = params.get('stop_condition')
+    self._batch_size = params.get('batch_size', 16)
+    self._eval_batch_size = params.get('eval_batch_size', self._val_set.size if self._val_set else 0)
+    self._eval_flexible = params.get('eval_flexible', True)
+    self._eval_train_every = params.get('eval_train_every', 10) if not self._eval_flexible else 1e1000
+    self._eval_validation_every = params.get('eval_validation_every', 100) if not self._eval_flexible else 1e1000
+    self._eval_test = params.get('evaluate_test', False) 
+
+**************************
+*                        *
+* 9. BaseSolver.train()  *
+*                        * 
+**************************
+   self._runner.build_model()	# Currently does nothing.
+   
+   while epochs_completed < self._epochs:
+       self._train_set.next_batch() # increment epochs_complted when all batches have been looked once.
+   
+       val_accuracy = self._evaluate_validation().get('accuracy')
+       self._val_accuracy_curve.append(val_accuracy)
+       if self.__stop_condition(self._val_accuracy_curve):
+          break
+   self._evaluate_test()
+
+   return self._reducer(self._val_accuracy_curve)
+
+10. HyperTuner()    # core class, do not modify
+  def __init__(self, hyper_params_spec, solver_generator, **strategy_params):
+    self.solver_generator = solver_generator
+
+    self.parsed = ParsedSpec(hyper_params_spec)
+    info('Spec size:', self.parsed.size())
+
+    sampler = DefaultSampler()
+    sampler.add_uniform(self.parsed.size())
+
+    strategy_gen = as_function(strategy_params.get('strategy', 'bayesian'), presets=strategies) # Can customize 
+    self.strategy = strategy_gen(sampler, strategy_params)
+
+    self.timeout = strategy_params.get('timeout', 0)
