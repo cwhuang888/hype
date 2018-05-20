@@ -1,3 +1,7 @@
+2018_05_20
+1. Model.fit(callbacks=[keras.callbacks.TensorBoard(log_dir='./logs/mnist_cnn/')]) produce Tensorboard graph/metrics
+
+2018_05_13
 1. change model to accept parameterized hyper-parameters, instead of hyper-engine looks up particular names. Such as input, label, mode, minimize, loss, accuracy.
 2. first try to change hyper-engine using keras mnist model
 3. mnist DataSet records
