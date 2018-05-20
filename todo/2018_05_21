@@ -4,3 +4,5 @@ b. mnist_dataset_api.py MNIST dataset with TensorFlow's Dataset API.
 
 Trace and find hooks to keras
 a. hyper-engine
+b. use name of 'interesting' tensors and nodes directly in hyper-engine
+c. substitue keras model fit, evaluate, prediction @ hyper-engine appropriate locations
