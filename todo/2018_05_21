@@ -1,0 +1,6 @@
+Trace 
+a. mnist_tfrecord.py MNIST dataset with TFRecords, the standard TensorFlow data format.
+b. mnist_dataset_api.py MNIST dataset with TensorFlow's Dataset API.
+
+Trace and find hooks to keras
+a. hyper-engine
