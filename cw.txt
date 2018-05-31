@@ -1,3 +1,7 @@
+2018_05_31
+1. renew both model and iterator (even dataset ?) in the beginning of a trial.
+2. re-initializable iterator to select different dataset
+
 2018_05_20
 1. Model.fit(callbacks=[keras.callbacks.TensorBoard(log_dir='./logs/mnist_cnn/')]) produce Tensorboard graph/metrics
 
