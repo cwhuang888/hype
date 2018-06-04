@@ -1,3 +1,20 @@
+5-1:
+'hyper_param_file': 'temp-mnist/example-5-1/hyper_param.txt',
+
+tuner.init():
+self.hyper_param_file = strategy_params.get('hyper_param_file', None)
+    if self.hyper_param_file is None:
+        exit('Please give a file name to store hyper-parameters candidates')
+
+tuner.tune():
+if accuracy > previous_max:
+          marker = '!'
+          with open(self.hyper_param_file, 'a') as myfile:
+              #myfile.write('accuracy=%.4f, params: %s' % (accuracy, smart_str(hyper_params)))
+              print('accuracy=%.4f, params: %s' % (accuracy, smart_str(hyper_params)), file=myfile)
+      else:
+          marker = ' '
+
 2018_05_31
 1. renew both model and iterator (even dataset ?) in the beginning of a trial.
 2. re-initializable iterator to select different dataset
