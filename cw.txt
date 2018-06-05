@@ -1,3 +1,5 @@
+{'conv': [{'activation': 'leaky_relu', 'batch_norm': False, 'down_sample': 'max_pooling2d', 'dropout': None, 'filters': [[3, 3, 48]]}, {'activation': 'elu', 'batch_norm': False, 'down_sample': 'max_pooling2d', 'dropout': None, 'filters': [[3, 3, 64]]}, {'activation': 'tanh', 'batch_norm': False, 'down_sample': 'average_pooling2d', 'dropout': None, 'filters': [[1, 1, 32], [3, 3, 256]]}, {'activation': 'leaky_relu', 'batch_norm': False, 'down_sample': 'max_pooling2d', 'dropout': None, 'filters': [[1, 1, 96], [2, 2, 512]]}, {'filters': [[1, 1, 128]]}, {'activation': 'elu', 'batch_norm': False, 'dropout': None, 'filters': [[2, 2, 512]], 'padding': 'valid'}, {'filters': [[1, 1, 10]]}], 'optimizer': {'beta1': 0.900000, 'beta2': 0.999000, 'epsilon': 1.000000e-08, 'learning_rate': 0.000893}}
+
 # Layer 3: accepts 8x8
     hype.spec.new(
       filters = [[1, 1, hype.spec.choice([32, 64])],
