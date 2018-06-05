@@ -1,3 +1,13 @@
+# Layer 3: accepts 8x8
+    hype.spec.new(
+      filters = [[1, 1, hype.spec.choice([32, 64])],
+                 [3, 3, hype.spec.choice([128, 192, 256])]],
+      activation = hype.spec.choice(ACTIVATIONS.keys()),
+      batch_norm = False,
+      dropout = None,
+      down_sample = hype.spec.choice(DOWN_SAMPLES.keys()),
+    ),
+
 5-1:
 'hyper_param_file': 'temp-mnist/example-5-1/hyper_param.txt',
 
